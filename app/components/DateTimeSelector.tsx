@@ -3,12 +3,11 @@
 interface DateTimeSelectorProps {
   startDate: string;
   startTime: string;
-  endDate: string;
   endTime: string;
   onStartDateChange: (date: string) => void;
   onStartTimeChange: (time: string) => void;
-  onEndDateChange: (date: string) => void;
   onEndTimeChange: (time: string) => void;
+  onDateChange?: (date: string) => void; // New prop for single date input
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -16,33 +15,33 @@ interface DateTimeSelectorProps {
 const DateTimeSelector = ({
   startDate,
   startTime,
-  endDate,
   endTime,
   onStartDateChange,
   onStartTimeChange,
-  onEndDateChange,
   onEndTimeChange,
+  onDateChange, // Destructure the new prop
   onConfirm,
   onCancel,
 }: DateTimeSelectorProps) => {
   return (
     <div className="mt-6 p-4 border border-blue-200 rounded-md">
       <h3 className="font-semibold mb-4">Set New Event Dates</h3>
-      
+
       <div className="space-y-4">
+        <div>
+          <label htmlFor="date" className="block text-sm font-medium mb-1">
+            Date
+          </label>
+          <input
+            type="date"
+            id="date"
+            value={startDate}
+            onChange={(e) => onDateChange ? onDateChange(e.target.value) : onStartDateChange(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="start-date" className="block text-sm font-medium mb-1">
-              Start Date
-            </label>
-            <input
-              type="date"
-              id="start-date"
-              value={startDate}
-              onChange={(e) => onStartDateChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
           <div>
             <label htmlFor="start-time" className="block text-sm font-medium mb-1">
               Start Time
@@ -52,21 +51,6 @@ const DateTimeSelector = ({
               id="start-time"
               value={startTime}
               onChange={(e) => onStartTimeChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="end-date" className="block text-sm font-medium mb-1">
-              End Date
-            </label>
-            <input
-              type="date"
-              id="end-date"
-              value={endDate}
-              onChange={(e) => onEndDateChange(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -84,7 +68,7 @@ const DateTimeSelector = ({
           </div>
         </div>
       </div>
-      
+
       <div className="flex gap-3 mt-6">
         <button
           onClick={onConfirm}

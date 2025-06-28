@@ -152,12 +152,15 @@ const EventDropdown = () => {
     if (selectedEventDetails) {
       const startDate = new Date(selectedEventDetails.start_date);
       const endDate = new Date(selectedEventDetails.end_date);
-      
       setNewStartDate(startDate.toISOString().split('T')[0]);
       setNewStartTime(startDate.toTimeString().split(' ')[0].slice(0, 5));
-      setNewEndDate(endDate.toISOString().split('T')[0]);
-      setNewEndTime(endDate.toTimeString().split(' ')[0].slice(0, 5));
+      setNewEndTime(endDate.toTimeString().split(' ')[0].slice(0, 5)); // Copy end time from the original event
     }
+  };
+
+  const handleDateChange = (date: string) => {
+    setNewStartDate(date);
+    setNewEndDate(date); // Set the same date for both start and end
   };
 
   const handleCancelCopy = () => {
@@ -191,7 +194,9 @@ const EventDropdown = () => {
       status: 'private',
       slug: slugWithDate, // Use the new slug with date
       image: selectedEventDetails.image?.url, // Preserve image if available
-      tags: selectedEventDetails.tags?.map((tag: { id: number }) => tag.id) || [], // Pass only tag IDs
+      tags: selectedEventDetails.tags
+        ?.filter((tag: { id: number; name?: string; slug?: string }) => tag.slug !== 'template' && tag.name?.toLowerCase() !== 'template')
+        .map((tag: { id: number }) => tag.id) || [], // Pass only tag IDs
       venue: selectedEventDetails.venue?.id || null, // Pass only venue ID
       organizer: selectedEventDetails.organizer?.id || null, // Pass only organizer ID
     };
@@ -332,14 +337,13 @@ const EventDropdown = () => {
         <DateTimeSelector
           startDate={newStartDate}
           startTime={newStartTime}
-          endDate={newEndDate}
           endTime={newEndTime}
           onStartDateChange={setNewStartDate}
           onStartTimeChange={setNewStartTime}
-          onEndDateChange={setNewEndDate}
           onEndTimeChange={setNewEndTime}
           onConfirm={handleConfirmCopy}
           onCancel={handleCancelCopy}
+          onDateChange={handleDateChange} // Pass the new date change handler
         />
       )}
     </div>
