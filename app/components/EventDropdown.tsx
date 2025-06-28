@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import CredentialsInput from './CredentialsInput';
+import EventSelector from './EventSelector';
 
 interface EventTag {
   id: number;
@@ -133,18 +135,6 @@ const EventDropdown = () => {
     fetchEventsWithTags();
   }, [username, password]);
 
-  const handleEventChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedEvent(e.target.value);
-  };
-
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
   const handleCopyEvent = () => {
     setShowDateTimeSelector(true);
     // Pre-populate with current event dates
@@ -219,68 +209,19 @@ const EventDropdown = () => {
       </h2>
       
       {/* Credentials Section */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-md border">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">WordPress Credentials</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={handleUsernameChange}
-              placeholder="Enter your WordPress username"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder="Enter your WordPress password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-        {(!username || !password) && (
-          <p className="mt-2 text-sm text-amber-600">
-            Please enter both username and password to load events.
-          </p>
-        )}
-      </div>
+      <CredentialsInput
+        username={username}
+        password={password}
+        onUsernameChange={setUsername}
+        onPasswordChange={setPassword}
+      />
       
-      <div className="mb-4">
-        <label htmlFor="event-select" className="block text-sm font-medium text-gray-700 mb-2">
-          Select an Event:
-        </label>
-        <select
-          id="event-select"
-          value={selectedEvent}
-          onChange={handleEventChange}
-          disabled={!username || !password}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-        >
-          <option value="">-- Choose an event --</option>
-          {events.map((event) => (
-            <option key={event.id} value={event.id.toString()}>
-              {event.title}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {events.length === 0 && (
-        <p className="text-gray-500 text-sm">
-          No events found with &quot;recurring&quot; or &quot;template&quot; tags.
-        </p>
-      )}
+      <EventSelector
+        events={events}
+        selectedEvent={selectedEvent}
+        onEventChange={setSelectedEvent}
+        disabled={!username || !password}
+      />
 
       {selectedEventDetails && (
         <div className="mt-6 p-4 bg-gray-50 rounded-md">

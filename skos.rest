@@ -1,0 +1,36 @@
+@baseUrl = https://skos.studio/wp-json
+@auth = {{$dotenv WP_CREDS}}
+# fetch events from the SKOS Studio WordPress site
+GET {{baseUrl}}/tribe/events/v1/events
+Authorization: Basic {{auth}}
+
+###
+
+GET {{baseUrl}}/tribe/events/v1/events/146
+Authorization: Basic {{auth}}
+
+####
+
+GET {{baseUrl}}/tribe/events/v1/events?starts_after=1980-01-01&tags=46,47
+Authorization: Basic {{auth}}
+
+####
+# fetch list of event tags
+GET {{baseUrl}}/tribe/events/v1/tags
+Authorization: Basic {{auth}}
+
+
+###
+# Create a new event with given slug
+POST {{baseUrl}}/tribe/events/v1/events/by-slug/custom-slug
+Authorization: Basic {{auth}}
+Content-Type: application/json
+
+{
+  "title": "Custom Event Title",
+  "start_date": "2023-10-01T10:00:00",
+  "end_date": "2023-10-01T12:00:00",
+  "content": "This is a custom event created via API.",
+  "status": "private",
+  "tags": [46]
+}
