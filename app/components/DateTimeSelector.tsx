@@ -7,9 +7,11 @@ interface DateTimeSelectorProps {
   onStartDateChange: (date: string) => void;
   onStartTimeChange: (time: string) => void;
   onEndTimeChange: (time: string) => void;
-  onDateChange?: (date: string) => void; // New prop for single date input
   onConfirm: () => void;
   onCancel: () => void;
+  onDateChange: (date: string) => void;
+  isPublic: boolean; // Added prop for public status
+  onPublicChange: (isPublic: boolean) => void; // Added prop for public status change
 }
 
 const DateTimeSelector = ({
@@ -19,9 +21,11 @@ const DateTimeSelector = ({
   onStartDateChange,
   onStartTimeChange,
   onEndTimeChange,
-  onDateChange, // Destructure the new prop
   onConfirm,
   onCancel,
+  onDateChange,
+  isPublic,
+  onPublicChange,
 }: DateTimeSelectorProps) => {
   return (
     <div className="mt-6 p-4 border border-blue-200 rounded-md">
@@ -67,6 +71,18 @@ const DateTimeSelector = ({
             />
           </div>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) => onPublicChange(e.target.checked)}
+            className="mr-2"
+          />
+          Make public
+        </label>
       </div>
 
       <div className="flex gap-3 mt-6">

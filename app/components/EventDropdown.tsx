@@ -47,6 +47,7 @@ const EventDropdown = () => {
   const [newEndTime, setNewEndTime] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isPublic, setIsPublic] = useState(false); // State for checkbox
 
   // API configuration
   const baseUrl = 'https://skos.studio/wp-json';
@@ -191,7 +192,7 @@ const EventDropdown = () => {
       title: `${selectedEventDetails.title}`,
       start_date: newStartDateTime,
       end_date: newEndDateTime,
-      status: 'private',
+      status: isPublic ? 'publish' : 'private', // Set status based on checkbox
       slug: slugWithDate, // Use the new slug with date
       image: selectedEventDetails.image?.url, // Preserve image if available
       tags: selectedEventDetails.tags
@@ -344,6 +345,8 @@ const EventDropdown = () => {
           onConfirm={handleConfirmCopy}
           onCancel={handleCancelCopy}
           onDateChange={handleDateChange} // Pass the new date change handler
+          isPublic={isPublic} // Pass the isPublic state
+          onPublicChange={setIsPublic} // Pass the setter for isPublic
         />
       )}
     </div>
