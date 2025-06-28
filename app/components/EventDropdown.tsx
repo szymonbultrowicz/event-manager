@@ -14,10 +14,20 @@ interface EventTag {
 interface Event {
   id: number;
   title: string;
+  slug: string;
   description?: string;
   start_date: string;
   end_date: string;
   url?: string;
+  image?: {
+    id: number;
+    url: string;
+  };
+  tags?: { id: number }[]; // Add tags property
+  venue?: { id: number }; // Add venue property
+  organizer?: { id: number }; // Add organizer property
+  global_id?: string; // Add global_id property
+  global_id_lineage?: string[]; // Add global_id_lineage property
 }
 
 interface ApiResponse<T> {
@@ -158,18 +168,59 @@ const EventDropdown = () => {
     setNewEndTime('');
   };
 
-  const handleConfirmCopy = () => {
-    // Here you would typically make an API call to create a new event
-    // For now, we'll just show an alert with the new event details
-    const newEvent = {
-      ...selectedEventDetails,
-      start_date: `${newStartDate}T${newStartTime}:00`,
-      end_date: `${newEndDate}T${newEndTime}:00`,
-      title: `${selectedEventDetails?.title} (Copy)`
+  const omit = <T, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+    const result = { ...obj };
+    keys.forEach(key => delete result[key]);
+    return result;
+  };
+
+  const handleConfirmCopy = async () => {
+    if (!selectedEventDetails) return;
+
+    const newStartDateTime = `${newStartDate}T${newStartTime}:00`;
+    const newEndDateTime = `${newEndDate}T${newEndTime}:00`;
+    const slugWithDate = `${selectedEventDetails.slug.replace(/\s+/g, '-')}-${newStartDate}`;
+
+    const eventDetailsWithoutIds = omit(selectedEventDetails, ['id', 'global_id', 'global_id_lineage']); // Exclude id, global_id, and global_id_lineage
+
+    const newEventPayload = {
+      ...eventDetailsWithoutIds, // Copy all other properties from the selected event
+      title: `${selectedEventDetails.title}`,
+      start_date: newStartDateTime,
+      end_date: newEndDateTime,
+      status: 'private',
+      slug: slugWithDate, // Use the new slug with date
+      image: selectedEventDetails.image?.url, // Preserve image if available
+      tags: selectedEventDetails.tags?.map((tag: { id: number }) => tag.id) || [], // Pass only tag IDs
+      venue: selectedEventDetails.venue?.id || null, // Pass only venue ID
+      organizer: selectedEventDetails.organizer?.id || null, // Pass only organizer ID
     };
-    
-    alert(`Event would be copied with:\nTitle: ${newEvent.title}\nStart: ${newEvent.start_date}\nEnd: ${newEvent.end_date}`);
-    setShowDateTimeSelector(false);
+
+    try {
+      const auth = `${username}:${password}`;
+      const authHeader = `Basic ${btoa(auth)}`;
+
+      const response = await fetch(`${baseUrl}/tribe/events/v1/events`, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newEventPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create event: ${response.status}`);
+      }
+
+      const createdEvent = await response.json();
+      alert(`Event successfully copied!\nTitle: ${createdEvent.title}\nStart: ${createdEvent.start_date}\nEnd: ${createdEvent.end_date}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while copying the event');
+      console.error('Error copying event:', err);
+    } finally {
+      setShowDateTimeSelector(false);
+    }
   };
 
   const selectedEventDetails = events.find(event => event.id.toString() === selectedEvent);

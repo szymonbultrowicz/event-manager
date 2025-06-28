@@ -26,13 +26,13 @@ const DateTimeSelector = ({
   onCancel,
 }: DateTimeSelectorProps) => {
   return (
-    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-      <h3 className="font-semibold text-gray-800 mb-4">Set New Event Dates</h3>
+    <div className="mt-6 p-4 border border-blue-200 rounded-md">
+      <h3 className="font-semibold mb-4">Set New Event Dates</h3>
       
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="start-date" className="block text-sm font-medium mb-1">
               Start Date
             </label>
             <input
@@ -44,7 +44,7 @@ const DateTimeSelector = ({
             />
           </div>
           <div>
-            <label htmlFor="start-time" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="start-time" className="block text-sm font-medium mb-1">
               Start Time
             </label>
             <input
@@ -59,7 +59,7 @@ const DateTimeSelector = ({
         
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="end-date" className="block text-sm font-medium mb-1">
               End Date
             </label>
             <input
@@ -71,7 +71,7 @@ const DateTimeSelector = ({
             />
           </div>
           <div>
-            <label htmlFor="end-time" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="end-time" className="block text-sm font-medium mb-1">
               End Time
             </label>
             <input
@@ -88,13 +88,13 @@ const DateTimeSelector = ({
       <div className="flex gap-3 mt-6">
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+          className="px-4 py-2 bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
         >
           Confirm Copy
         </button>
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+          className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
         >
           Cancel
         </button>
