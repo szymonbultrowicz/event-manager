@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
+import DateTimeSelector from './DateTimeSelector';
 
 interface EventTag {
   id: number;
@@ -177,9 +178,9 @@ const EventDropdown = () => {
     return (
       <div className="p-6 max-w-md mx-auto">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-10 bg-gray-200 rounded mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 rounded w-1/4 mb-4"></div>
+          <div className="h-10 rounded mb-4"></div>
+          <div className="h-4 rounded w-3/4"></div>
         </div>
       </div>
     );
@@ -188,13 +189,11 @@ const EventDropdown = () => {
   if (error) {
     return (
       <div className="p-6 max-w-md mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                {error}
-              </div>
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium">Error</h3>
+            <div className="mt-2 text-sm">
+              {error}
             </div>
           </div>
         </div>
@@ -203,8 +202,8 @@ const EventDropdown = () => {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+    <div className="p-6 max-w-2xl mx-auto rounded-lg shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">
         SKOS Events (Recurring & Template)
       </h2>
       
@@ -224,42 +223,42 @@ const EventDropdown = () => {
       />
 
       {selectedEventDetails && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <h3 className="font-semibold text-gray-800 mb-2">Event Details</h3>
+        <div className="mt-6 p-4 rounded-md">
+          <h3 className="font-semibold mb-2">Event Details</h3>
           <div className="space-y-2 text-sm">
             <div>
-              <span className="font-medium text-gray-600">Title:</span>
-              <span className="ml-2 text-gray-800">{selectedEventDetails.title}</span>
+              <span className="font-medium">Title:</span>
+              <span className="ml-2">{selectedEventDetails.title}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-600">Start Date:</span>
-              <span className="ml-2 text-gray-800">
+              <span className="font-medium">Start Date:</span>
+              <span className="ml-2">
                 {new Date(selectedEventDetails.start_date).toLocaleDateString()}
               </span>
             </div>
             <div>
-              <span className="font-medium text-gray-600">End Date:</span>
-              <span className="ml-2 text-gray-800">
+              <span className="font-medium">End Date:</span>
+              <span className="ml-2">
                 {new Date(selectedEventDetails.end_date).toLocaleDateString()}
               </span>
             </div>
             {selectedEventDetails.description && (
               <div>
-                <span className="font-medium text-gray-600">Description:</span>
+                <span className="font-medium">Description:</span>
                 <div 
-                  className="ml-2 text-gray-800 mt-1"
+                  className="ml-2 mt-1"
                   dangerouslySetInnerHTML={{ __html: selectedEventDetails.description }}
                 />
               </div>
             )}
             {selectedEventDetails.url && (
               <div>
-                <span className="font-medium text-gray-600">URL:</span>
+                <span className="font-medium">URL:</span>
                 <a 
                   href={selectedEventDetails.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                  className="ml-2 underline"
                 >
                   View Event
                 </a>
@@ -270,7 +269,7 @@ const EventDropdown = () => {
           <div className="mt-4">
             <button
               onClick={handleCopyEvent}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
               Copy Event
             </button>
@@ -279,80 +278,18 @@ const EventDropdown = () => {
       )}
 
       {showDateTimeSelector && selectedEventDetails && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <h3 className="font-semibold text-gray-800 mb-4">Set New Event Dates</h3>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  id="start-date"
-                  value={newStartDate}
-                  onChange={(e) => setNewStartDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="start-time" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Time
-                </label>
-                <input
-                  type="time"
-                  id="start-time"
-                  value={newStartTime}
-                  onChange={(e) => setNewStartTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  id="end-date"
-                  value={newEndDate}
-                  onChange={(e) => setNewEndDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="end-time" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Time
-                </label>
-                <input
-                  type="time"
-                  id="end-time"
-                  value={newEndTime}
-                  onChange={(e) => setNewEndTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex gap-3 mt-6">
-            <button
-              onClick={handleConfirmCopy}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
-            >
-              Confirm Copy
-            </button>
-            <button
-              onClick={handleCancelCopy}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <DateTimeSelector
+          startDate={newStartDate}
+          startTime={newStartTime}
+          endDate={newEndDate}
+          endTime={newEndTime}
+          onStartDateChange={setNewStartDate}
+          onStartTimeChange={setNewStartTime}
+          onEndDateChange={setNewEndDate}
+          onEndTimeChange={setNewEndTime}
+          onConfirm={handleConfirmCopy}
+          onCancel={handleCancelCopy}
+        />
       )}
     </div>
   );

@@ -22,11 +22,11 @@ const CredentialsInput = ({
   };
 
   return (
-    <div className="mb-6 p-4 bg-gray-50 rounded-md border">
-      <h3 className="text-sm font-semibold text-gray-800 mb-3">WordPress Credentials</h3>
+    <div className="mb-6 p-4 rounded-md border">
+      <h3 className="text-sm font-semiboldmb-3">WordPress Credentials</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-500 mb-1">
             Username
           </label>
           <input
@@ -39,7 +39,7 @@ const CredentialsInput = ({
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-500 mb-1">
             Password
           </label>
           <input

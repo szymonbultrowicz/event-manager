@@ -28,7 +28,7 @@ const EventSelector = ({
 
   return (
     <div className="mb-4">
-      <label htmlFor="event-select" className="block text-sm font-medium text-gray-700 mb-2">
+      <label htmlFor="event-select" className="block text-sm font-medium mb-2">
         Select an Event:
       </label>
       <select
@@ -47,7 +47,7 @@ const EventSelector = ({
       </select>
       
       {events.length === 0 && (
-        <p className="text-gray-500 text-sm mt-2">
+        <p className="text-sm mt-2">
           No events found with &quot;recurring&quot; or &quot;template&quot; tags.
         </p>
       )}
