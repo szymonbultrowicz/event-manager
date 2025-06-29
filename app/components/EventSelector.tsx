@@ -48,7 +48,7 @@ const EventSelector = ({
       
       {events.length === 0 && (
         <p className="text-sm mt-2">
-          No events found with &quot;recurring&quot; or &quot;template&quot; tags.
+          No events found with &quot;template&quot; tag.
         </p>
       )}
     </div>

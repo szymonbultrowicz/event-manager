@@ -102,21 +102,17 @@ const EventDropdown = () => {
         const tagsData: ApiResponse<EventTag> = await tagsResponse.json();
         const tags = tagsData.tags || [];
 
-        // Find the IDs of "recurring" and "template" tags
-        const recurringTag = tags.find(tag => 
-          tag.name.toLowerCase() === 'recurring' || tag.slug === 'recurring'
-        );
+        // Find the IDs of the "template" tag
         const templateTag = tags.find(tag => 
           tag.name.toLowerCase() === 'template' || tag.slug === 'template'
         );
 
-        if (!recurringTag && !templateTag) {
-          throw new Error('Neither "recurring" nor "template" tags found');
+        if (!templateTag) {
+          throw new Error('No "template" tag found');
         }
 
         // Build tag IDs array
         const tagIds: number[] = [];
-        if (recurringTag) tagIds.push(recurringTag.id);
         if (templateTag) tagIds.push(templateTag.id);
 
         // Fetch events filtered by the found tag IDs
