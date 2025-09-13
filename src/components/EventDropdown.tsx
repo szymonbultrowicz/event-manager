@@ -20,13 +20,14 @@ const EventDropdown = () => {
   const [newEndTime, setNewEndTime] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [hasAttemptedLogin, setHasAttemptedLogin] = useState(false);
 
   // Use custom hooks
   const { username, password, setUsername, setPassword } = useCredentials();
-  const { events, loading, error, isAuthError } = useEvents(username, password);
+  const { events, loading, error, isAuthError, triggerAuth } = useEvents(username, password);
 
-  // Check if user is logged in
-  const isLoggedIn = Boolean(username && password);
+  // Check if user is logged in (has attempted login and has credentials)
+  const isLoggedIn = Boolean(hasAttemptedLogin && username && password);
 
   const handleLogout = () => {
     setUsername('');
@@ -34,6 +35,12 @@ const EventDropdown = () => {
     setSelectedEvent('');
     setShowDateTimeSelector(false);
     setCopyError(null);
+    setHasAttemptedLogin(false);
+  };
+
+  const handleLogin = () => {
+    setHasAttemptedLogin(true);
+    triggerAuth();
   };
 
   const handleCopyEvent = () => {
@@ -130,6 +137,8 @@ const EventDropdown = () => {
           password={password}
           onUsernameChange={setUsername}
           onPasswordChange={setPassword}
+          onLogin={handleLogin}
+          isLoading={loading}
         />
       ) : (
         <UserStatus

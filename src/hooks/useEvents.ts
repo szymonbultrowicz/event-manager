@@ -6,21 +6,32 @@ interface UseEventsReturn {
   loading: boolean;
   error: string | null;
   isAuthError: boolean;
+  triggerAuth: () => void;
 }
 
 export const useEvents = (username: string, password: string): UseEventsReturn => {
   const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthError, setIsAuthError] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(false);
 
   const baseUrl = 'https://skos.studio/wp-json';
 
+  const triggerAuth = () => {
+    if (username && password) {
+      setShouldFetch(true);
+    }
+  };
+
   useEffect(() => {
-    if (!username || !password) {
-      setLoading(false);
-      setError(null);
-      setIsAuthError(false);
+    if (!username || !password || !shouldFetch) {
+      if (!username || !password) {
+        setLoading(false);
+        setError(null);
+        setIsAuthError(false);
+        setEvents([]);
+      }
       return;
     }
 
@@ -91,11 +102,12 @@ export const useEvents = (username: string, password: string): UseEventsReturn =
         console.error('Error fetching events:', err);
       } finally {
         setLoading(false);
+        setShouldFetch(false); // Reset the trigger
       }
     };
 
     fetchEventsWithTags();
-  }, [username, password, baseUrl]);
+  }, [username, password, baseUrl, shouldFetch]);
 
-  return { events, loading, error, isAuthError };
+  return { events, loading, error, isAuthError, triggerAuth };
 };
