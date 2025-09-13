@@ -1,147 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
 import DateTimeSelector from './DateTimeSelector';
-
-interface EventTag {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface Event {
-  id: number;
-  title: string;
-  slug: string;
-  description?: string;
-  start_date: string;
-  end_date: string;
-  url?: string;
-  image?: {
-    id: number;
-    url: string;
-  };
-  tags?: { id: number }[]; // Add tags property
-  venue?: { id: number }; // Add venue property
-  organizer?: { id: number }; // Add organizer property
-  global_id?: string; // Add global_id property
-  global_id_lineage?: string[]; // Add global_id_lineage property
-}
-
-interface ApiResponse<T> {
-  events?: T[];
-  tags?: T[];
-}
+import EventDetails from './EventDetails';
+import { useCredentials } from '../hooks/useCredentials';
+import { useEvents } from '../hooks/useEvents';
+import { copyEventService } from '../services/eventCopyService';
+import { Event, EventCopyData } from '../types/event.types';
 
 const EventDropdown = () => {
-  const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<string>('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showDateTimeSelector, setShowDateTimeSelector] = useState(false);
   const [newStartDate, setNewStartDate] = useState('');
   const [newStartTime, setNewStartTime] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [newEndTime, setNewEndTime] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPublic, setIsPublic] = useState(false); // State for checkbox
+  const [isPublic, setIsPublic] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
-  // API configuration
-  const baseUrl = 'https://skos.studio/wp-json';
-
-  // Load credentials from localStorage on component mount
-  useEffect(() => {
-    const savedUsername = localStorage.getItem('skos-username');
-    const savedPassword = localStorage.getItem('skos-password');
-    
-    if (savedUsername) setUsername(savedUsername);
-    if (savedPassword) setPassword(savedPassword);
-  }, []);
-
-  // Save credentials to localStorage when they change
-  useEffect(() => {
-    if (username) {
-      localStorage.setItem('skos-username', username);
-    }
-  }, [username]);
-
-  useEffect(() => {
-    if (password) {
-      localStorage.setItem('skos-password', password);
-    }
-  }, [password]);
-
-  useEffect(() => {
-    if (!username || !password) {
-      setLoading(false);
-      return;
-    }
-
-    const auth = `${username}:${password}`;
-    const authHeader = `Basic ${btoa(auth)}`;
-    const fetchEventsWithTags = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // First, fetch all event tags
-        const tagsResponse = await fetch(`${baseUrl}/tribe/events/v1/tags`, {
-          headers: {
-            'Authorization': authHeader,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!tagsResponse.ok) {
-          throw new Error(`Failed to fetch tags: ${tagsResponse.status}`);
-        }
-
-        const tagsData: ApiResponse<EventTag> = await tagsResponse.json();
-        const tags = tagsData.tags || [];
-
-        // Find the IDs of the "template" tag
-        const templateTag = tags.find(tag => 
-          tag.name.toLowerCase() === 'template' || tag.slug === 'template'
-        );
-
-        if (!templateTag) {
-          throw new Error('No "template" tag found');
-        }
-
-        // Build tag IDs array
-        const tagIds: number[] = [];
-        if (templateTag) tagIds.push(templateTag.id);
-
-        // Fetch events filtered by the found tag IDs
-        const eventsUrl = `${baseUrl}/tribe/events/v1/events?starts_after=1980-01-01&tags=${tagIds.join(',')}`;
-        const eventsResponse = await fetch(eventsUrl, {
-          headers: {
-            'Authorization': authHeader,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!eventsResponse.ok) {
-          throw new Error(`Failed to fetch events: ${eventsResponse.status}`);
-        }
-
-        const eventsData: ApiResponse<Event> = await eventsResponse.json();
-        const fetchedEvents = eventsData.events || [];
-
-        setEvents(fetchedEvents);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching events:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEventsWithTags();
-  }, [username, password]);
+  // Use custom hooks
+  const { username, password, setUsername, setPassword } = useCredentials();
+  const { events, loading, error } = useEvents(username, password);
 
   const handleCopyEvent = () => {
     setShowDateTimeSelector(true);
@@ -151,13 +32,13 @@ const EventDropdown = () => {
       const endDate = new Date(selectedEventDetails.end_date);
       setNewStartDate(startDate.toISOString().split('T')[0]);
       setNewStartTime(startDate.toTimeString().split(' ')[0].slice(0, 5));
-      setNewEndTime(endDate.toTimeString().split(' ')[0].slice(0, 5)); // Copy end time from the original event
+      setNewEndTime(endDate.toTimeString().split(' ')[0].slice(0, 5));
     }
   };
 
   const handleDateChange = (date: string) => {
     setNewStartDate(date);
-    setNewEndDate(date); // Set the same date for both start and end
+    setNewEndDate(date);
   };
 
   const handleCancelCopy = () => {
@@ -168,57 +49,27 @@ const EventDropdown = () => {
     setNewEndTime('');
   };
 
-  const omit = <T, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
-    const result = { ...obj };
-    keys.forEach(key => delete result[key]);
-    return result;
-  };
-
   const handleConfirmCopy = async () => {
     if (!selectedEventDetails) return;
 
-    const newStartDateTime = `${newStartDate}T${newStartTime}:00`;
-    const newEndDateTime = `${newEndDate}T${newEndTime}:00`;
-    const slugWithDate = `${selectedEventDetails.slug.replace(/\s+/g, '-')}-${newStartDate}`;
-
-    const eventDetailsWithoutIds = omit(selectedEventDetails, ['id', 'global_id', 'global_id_lineage']); // Exclude id, global_id, and global_id_lineage
-
-    const newEventPayload = {
-      ...eventDetailsWithoutIds, // Copy all other properties from the selected event
-      title: `${selectedEventDetails.title}`,
-      start_date: newStartDateTime,
-      end_date: newEndDateTime,
-      status: isPublic ? 'publish' : 'private', // Set status based on checkbox
-      slug: slugWithDate, // Use the new slug with date
-      image: selectedEventDetails.image?.url, // Preserve image if available
-      tags: selectedEventDetails.tags
-        ?.filter((tag: { id: number; name?: string; slug?: string }) => tag.slug !== 'template' && tag.name?.toLowerCase() !== 'template')
-        .map((tag: { id: number }) => tag.id) || [], // Pass only tag IDs
-      venue: selectedEventDetails.venue?.id || null, // Pass only venue ID
-      organizer: selectedEventDetails.organizer?.id || null, // Pass only organizer ID
+    const copyData: EventCopyData = {
+      newStartDate,
+      newStartTime,
+      newEndDate,
+      newEndTime,
+      isPublic,
     };
 
     try {
-      const auth = `${username}:${password}`;
-      const authHeader = `Basic ${btoa(auth)}`;
-
-      const response = await fetch(`${baseUrl}/tribe/events/v1/events`, {
-        method: 'POST',
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newEventPayload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create event: ${response.status}`);
-      }
-
-      const createdEvent = await response.json();
+      const createdEvent = await copyEventService(
+        selectedEventDetails,
+        copyData,
+        username,
+        password
+      );
       alert(`Event successfully copied!\nTitle: ${createdEvent.title}\nStart: ${createdEvent.start_date}\nEnd: ${createdEvent.end_date}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while copying the event');
+      setCopyError(err instanceof Error ? err.message : 'An error occurred while copying the event');
       console.error('Error copying event:', err);
     } finally {
       setShowDateTimeSelector(false);
@@ -276,57 +127,15 @@ const EventDropdown = () => {
       />
 
       {selectedEventDetails && (
-        <div className="mt-6 p-4 rounded-md">
-          <h3 className="font-semibold mb-2">Event Details</h3>
-          <div className="space-y-2 text-sm">
-            <div>
-              <span className="font-medium">Title:</span>
-              <span className="ml-2">{selectedEventDetails.title}</span>
-            </div>
-            <div>
-              <span className="font-medium">Start Date:</span>
-              <span className="ml-2">
-                {new Date(selectedEventDetails.start_date).toLocaleDateString()}
-              </span>
-            </div>
-            <div>
-              <span className="font-medium">End Date:</span>
-              <span className="ml-2">
-                {new Date(selectedEventDetails.end_date).toLocaleDateString()}
-              </span>
-            </div>
-            {selectedEventDetails.description && (
-              <div>
-                <span className="font-medium">Description:</span>
-                <div 
-                  className="ml-2 mt-1"
-                  dangerouslySetInnerHTML={{ __html: selectedEventDetails.description }}
-                />
-              </div>
-            )}
-            {selectedEventDetails.url && (
-              <div>
-                <span className="font-medium">URL:</span>
-                <a 
-                  href={selectedEventDetails.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-2 underline"
-                >
-                  View Event
-                </a>
-              </div>
-            )}
-          </div>
-          
-          <div className="mt-4">
-            <button
-              onClick={handleCopyEvent}
-              className="px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-            >
-              Copy Event
-            </button>
-          </div>
+        <EventDetails
+          event={selectedEventDetails}
+          onCopy={handleCopyEvent}
+        />
+      )}
+
+      {copyError && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600 text-sm">{copyError}</p>
         </div>
       )}
 
