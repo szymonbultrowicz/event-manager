@@ -1,16 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Event, EventTag, ApiResponse } from '../types/event.types';
 
-export const useEvents = (username: string, password: string) => {
+interface UseEventsReturn {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  isAuthError: boolean;
+}
+
+export const useEvents = (username: string, password: string): UseEventsReturn => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthError, setIsAuthError] = useState(false);
 
   const baseUrl = 'https://skos.studio/wp-json';
 
   useEffect(() => {
     if (!username || !password) {
       setLoading(false);
+      setError(null);
+      setIsAuthError(false);
       return;
     }
 
@@ -21,6 +31,7 @@ export const useEvents = (username: string, password: string) => {
       try {
         setLoading(true);
         setError(null);
+        setIsAuthError(false);
 
         // First, fetch all event tags
         const tagsResponse = await fetch(`${baseUrl}/tribe/events/v1/tags`, {
@@ -31,6 +42,10 @@ export const useEvents = (username: string, password: string) => {
         });
 
         if (!tagsResponse.ok) {
+          if (tagsResponse.status === 401) {
+            setIsAuthError(true);
+            throw new Error('Invalid credentials. Please check your username and password.');
+          }
           throw new Error(`Failed to fetch tags: ${tagsResponse.status}`);
         }
 
@@ -60,6 +75,10 @@ export const useEvents = (username: string, password: string) => {
         });
 
         if (!eventsResponse.ok) {
+          if (eventsResponse.status === 401) {
+            setIsAuthError(true);
+            throw new Error('Invalid credentials. Please check your username and password.');
+          }
           throw new Error(`Failed to fetch events: ${eventsResponse.status}`);
         }
 
@@ -78,5 +97,5 @@ export const useEvents = (username: string, password: string) => {
     fetchEventsWithTags();
   }, [username, password, baseUrl]);
 
-  return { events, loading, error };
+  return { events, loading, error, isAuthError };
 };

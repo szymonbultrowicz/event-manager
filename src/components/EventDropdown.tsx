@@ -23,7 +23,7 @@ const EventDropdown = () => {
 
   // Use custom hooks
   const { username, password, setUsername, setPassword } = useCredentials();
-  const { events, loading, error } = useEvents(username, password);
+  const { events, loading, error, isAuthError } = useEvents(username, password);
 
   // Check if user is logged in
   const isLoggedIn = Boolean(username && password);
@@ -102,7 +102,7 @@ const EventDropdown = () => {
     );
   }
 
-  if (error) {
+  if (error && !isAuthError) {
     return (
       <div className="p-6 max-w-md mx-auto">
         <div className="flex">
@@ -135,6 +135,8 @@ const EventDropdown = () => {
         <UserStatus
           username={username}
           onLogout={handleLogout}
+          isAuthError={isAuthError}
+          error={error}
         />
       )}
       
