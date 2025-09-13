@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventDropdown from './EventDropdown';
 import UserStatus from './UserStatus';
@@ -22,11 +22,20 @@ const MainPage = () => {
   const [hasAttemptedLogin, setHasAttemptedLogin] = useState(false);
 
   // Use custom hooks
-  const { username, password, setUsername, setPassword } = useCredentials();
+  const { username, password, setUsername, setPassword, credentialsLoadedFromStorage, resetStorageFlag } = useCredentials();
   const { events, loading, error, isAuthError, triggerAuth } = useEvents(username, password);
 
   // Check if user is logged in (has attempted login and has credentials)
   const isLoggedIn = Boolean(hasAttemptedLogin && username && password);
+
+  // Auto-login when credentials are loaded from localStorage
+  useEffect(() => {
+    if (credentialsLoadedFromStorage && username && password && !hasAttemptedLogin) {
+      setHasAttemptedLogin(true);
+      triggerAuth();
+      resetStorageFlag(); // Reset the flag to prevent re-triggering
+    }
+  }, [credentialsLoadedFromStorage, username, password, hasAttemptedLogin, triggerAuth, resetStorageFlag]);
 
   const handleLogout = () => {
     setUsername('');
@@ -35,6 +44,10 @@ const MainPage = () => {
     setShowDateTimeSelector(false);
     setCopyError(null);
     setHasAttemptedLogin(false);
+    resetStorageFlag();
+    // Clear credentials from localStorage
+    localStorage.removeItem('skos-username');
+    localStorage.removeItem('skos-password');
   };
 
   const handleLogin = () => {
@@ -148,14 +161,16 @@ const MainPage = () => {
         />
       )}
       
-      {/* Event Dropdown Section */}
-      <EventDropdown
-        events={events}
-        selectedEvent={selectedEvent}
-        onEventChange={setSelectedEvent}
-        onCopyEvent={handleCopyEvent}
-        disabled={!isLoggedIn}
-      />
+      {/* Event Dropdown Section - Only show when logged in and authentication successful */}
+      {isLoggedIn && !isAuthError && (
+        <EventDropdown
+          events={events}
+          selectedEvent={selectedEvent}
+          onEventChange={setSelectedEvent}
+          onCopyEvent={handleCopyEvent}
+          disabled={false}
+        />
+      )}
 
       {/* Copy Error Display */}
       {copyError && (
