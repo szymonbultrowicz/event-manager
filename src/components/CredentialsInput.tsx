@@ -1,3 +1,5 @@
+'use client';
+
 interface CredentialsInputProps {
   username: string;
   password: string;
@@ -9,7 +11,7 @@ const CredentialsInput = ({
   username, 
   password, 
   onUsernameChange, 
-  onPasswordChange, 
+  onPasswordChange 
 }: CredentialsInputProps) => {
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUsernameChange(e.target.value);
@@ -19,14 +21,9 @@ const CredentialsInput = ({
     onPasswordChange(e.target.value);
   };
 
-  const handleLogout = () => {
-    onUsernameChange('');
-    onPasswordChange('');
-  };
-
   return (
     <div className="mb-6 p-4 rounded-md border">
-      <h3 className="text-sm font-semibold mb-3">WordPress Credentials</h3>
+      <h3 className="text-sm font-semiboldmb-3">WordPress Credentials</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-500 mb-1">
@@ -59,14 +56,6 @@ const CredentialsInput = ({
         <p className="mt-2 text-sm text-amber-600">
           Please enter both username and password to load events.
         </p>
-      )}
-      {username && password && (
-        <button
-          onClick={handleLogout}
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-        >
-          Logout
-        </button>
       )}
     </div>
   );

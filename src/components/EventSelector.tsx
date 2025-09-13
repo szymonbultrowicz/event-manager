@@ -1,3 +1,5 @@
+'use client';
+
 interface Event {
   id: number;
   title: string;

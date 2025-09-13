@@ -1,3 +1,5 @@
+'use client';
+
 interface DateTimeSelectorProps {
   startDate: string;
   startTime: string;
