@@ -21,10 +21,7 @@ const CredentialsInput = ({
     onPasswordChange(e.target.value);
   };
 
-  const handleLogout = () => {
-    onUsernameChange('');
-    onPasswordChange('');
-  };
+
 
   return (
     <div className="mb-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
@@ -92,20 +89,6 @@ const CredentialsInput = ({
                 Please enter both username and password to load events.
               </p>
             </div>
-          </div>
-        )}
-
-        {username && password && (
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 rounded-lg transition-colors duration-200 border border-red-200 dark:border-red-700 font-medium"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
           </div>
         )}
       </div>

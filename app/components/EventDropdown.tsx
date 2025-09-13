@@ -5,6 +5,7 @@ import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
 import NewEventForm from '@/src/components/NewEventForm';
 import EventDetails from './EventDetails';
+import UserStatus from '@/src/components/UserStatus';
 import { useCredentials } from '../hooks/useCredentials';
 import { useEvents } from '../hooks/useEvents';
 import { copyEventService } from '../services/eventCopyService';
@@ -23,6 +24,13 @@ const EventDropdown = () => {
   // Use custom hooks
   const { username, password, setUsername, setPassword } = useCredentials();
   const { events, loading, error } = useEvents(username, password);
+
+  const handleLogout = () => {
+    setUsername('');
+    setPassword('');
+  };
+
+  const isLoggedIn = username && password;
 
   const handleCopyEvent = () => {
     setShowNewEventForm(true);
@@ -130,16 +138,23 @@ const EventDropdown = () => {
         </div>
       </div>
       
-      {/* Credentials Section */}
-      <CredentialsInput
-        username={username}
-        password={password}
-        onUsernameChange={setUsername}
-        onPasswordChange={setPassword}
-      />
+      {/* Credentials/User Status Section */}
+      {isLoggedIn ? (
+        <UserStatus 
+          username={username}
+          onLogout={handleLogout}
+        />
+      ) : (
+        <CredentialsInput
+          username={username}
+          password={password}
+          onUsernameChange={setUsername}
+          onPasswordChange={setPassword}
+        />
+      )}
       
       {/* Event Selector */}
-      {(username && password) && (
+      {isLoggedIn && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-4">
             <h3 className="text-xl font-bold text-white flex items-center">
@@ -154,7 +169,7 @@ const EventDropdown = () => {
               events={events}
               selectedEvent={selectedEvent}
               onEventChange={setSelectedEvent}
-              disabled={!username || !password}
+              disabled={!isLoggedIn}
             />
           </div>
         </div>

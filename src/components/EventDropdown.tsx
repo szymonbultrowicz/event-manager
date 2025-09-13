@@ -4,6 +4,7 @@ import { useState } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
 import EventDetails from './EventDetails';
+import UserStatus from './UserStatus';
 import { useCredentials } from '../hooks/useCredentials';
 import { useEvents } from '../hooks/useEvents';
 import { copyEventService } from '../services/eventCopyService';
@@ -23,6 +24,17 @@ const EventDropdown = () => {
   // Use custom hooks
   const { username, password, setUsername, setPassword } = useCredentials();
   const { events, loading, error } = useEvents(username, password);
+
+  // Check if user is logged in
+  const isLoggedIn = Boolean(username && password);
+
+  const handleLogout = () => {
+    setUsername('');
+    setPassword('');
+    setSelectedEvent('');
+    setShowDateTimeSelector(false);
+    setCopyError(null);
+  };
 
   const handleCopyEvent = () => {
     setShowDateTimeSelector(true);
@@ -112,12 +124,19 @@ const EventDropdown = () => {
       </h2>
       
       {/* Credentials Section */}
-      <CredentialsInput
-        username={username}
-        password={password}
-        onUsernameChange={setUsername}
-        onPasswordChange={setPassword}
-      />
+      {!isLoggedIn ? (
+        <CredentialsInput
+          username={username}
+          password={password}
+          onUsernameChange={setUsername}
+          onPasswordChange={setPassword}
+        />
+      ) : (
+        <UserStatus
+          username={username}
+          onLogout={handleLogout}
+        />
+      )}
       
       <EventSelector
         events={events}
