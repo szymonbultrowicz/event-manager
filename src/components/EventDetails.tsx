@@ -24,7 +24,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onCopy }) => {
   };
 
   return (
-    <div className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+    <div className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden mb-8">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
         <h3 className="text-xl font-bold text-white">Event Details</h3>

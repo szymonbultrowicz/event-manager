@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
-import DateTimeSelector from './DateTimeSelector';
 import EventDetails from './EventDetails';
 import { useCredentials } from '../hooks/useCredentials';
 import { useEvents } from '../hooks/useEvents';
 import { copyEventService } from '../services/eventCopyService';
 import { Event, EventCopyData } from '../types/event.types';
+import NewEventForm from './NewEventForm';
 
 const EventDropdown = () => {
   const [selectedEvent, setSelectedEvent] = useState<string>('');
@@ -140,7 +140,7 @@ const EventDropdown = () => {
       )}
 
       {showDateTimeSelector && selectedEventDetails && (
-        <DateTimeSelector
+        <NewEventForm
           startDate={newStartDate}
           startTime={newStartTime}
           endTime={newEndTime}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import CredentialsInput from './CredentialsInput';
 import EventSelector from './EventSelector';
-import DateTimeSelector from './DateTimeSelector';
+import NewEventForm from '@/src/components/NewEventForm';
 import EventDetails from './EventDetails';
 import { useCredentials } from '../hooks/useCredentials';
 import { useEvents } from '../hooks/useEvents';
@@ -12,7 +12,7 @@ import { Event, EventCopyData } from '../types/event.types';
 
 const EventDropdown = () => {
   const [selectedEvent, setSelectedEvent] = useState<string>('');
-  const [showDateTimeSelector, setShowDateTimeSelector] = useState(false);
+  const [showNewEventForm, setShowNewEventForm] = useState(false);
   const [newStartDate, setNewStartDate] = useState('');
   const [newStartTime, setNewStartTime] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
@@ -25,7 +25,7 @@ const EventDropdown = () => {
   const { events, loading, error } = useEvents(username, password);
 
   const handleCopyEvent = () => {
-    setShowDateTimeSelector(true);
+    setShowNewEventForm(true);
     // Pre-populate with current event dates
     if (selectedEventDetails) {
       const startDate = new Date(selectedEventDetails.start_date);
@@ -42,7 +42,7 @@ const EventDropdown = () => {
   };
 
   const handleCancelCopy = () => {
-    setShowDateTimeSelector(false);
+    setShowNewEventForm(false);
     setNewStartDate('');
     setNewStartTime('');
     setNewEndDate('');
@@ -72,7 +72,7 @@ const EventDropdown = () => {
       setCopyError(err instanceof Error ? err.message : 'An error occurred while copying the event');
       console.error('Error copying event:', err);
     } finally {
-      setShowDateTimeSelector(false);
+      setShowNewEventForm(false);
     }
   };
 
@@ -183,7 +183,7 @@ const EventDropdown = () => {
         </div>
       )}
 
-      {showDateTimeSelector && selectedEventDetails && (
+      {showNewEventForm && selectedEventDetails && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-cyan-600 to-blue-600 px-6 py-4">
             <h3 className="text-xl font-bold text-white flex items-center">
@@ -194,7 +194,7 @@ const EventDropdown = () => {
             </h3>
           </div>
           <div className="p-6">
-            <DateTimeSelector
+            <NewEventForm
               startDate={newStartDate}
               startTime={newStartTime}
               endTime={newEndTime}
