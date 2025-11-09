@@ -18,7 +18,7 @@ export const copyEventService = async (
   const newEndDateTime = `${copyData.newEndDate}T${copyData.newEndTime}:00`;
   const slugWithDate = `${selectedEvent.slug.replace(/\s+/g, '-')}-${copyData.newStartDate}`;
 
-  const eventDetailsWithoutIds = omit(selectedEvent, ['id', 'global_id', 'global_id_lineage']);
+  const eventDetailsWithoutIds = omit(selectedEvent, ['id', 'global_id', 'global_id_lineage', 'organizer', 'venue', 'tags', 'image']);
 
   const newEventPayload = {
     ...eventDetailsWithoutIds,
@@ -50,7 +50,9 @@ export const copyEventService = async (
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create event: ${response.status}`);
+    const errorData = await response.json().catch(() => null);
+    const errorMessage = errorData?.message || `Failed to create event: ${response.status}`;
+    throw new Error(errorMessage);
   }
 
   return await response.json();
