@@ -17,7 +17,7 @@ const MainPage = () => {
   const [newStartTime, setNewStartTime] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [newEndTime, setNewEndTime] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [hasAttemptedLogin, setHasAttemptedLogin] = useState(false);
 
