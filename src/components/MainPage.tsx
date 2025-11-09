@@ -57,11 +57,13 @@ const MainPage = () => {
 
   const handleCopyEvent = () => {
     setShowDateTimeSelector(true);
-    // Pre-populate with current event dates
+    // Pre-populate with today's date and original event times
+    const today = new Date();
+    setNewStartDate(today.toISOString().split('T')[0]);
+    
     if (selectedEventDetails) {
       const startDate = new Date(selectedEventDetails.start_date);
       const endDate = new Date(selectedEventDetails.end_date);
-      setNewStartDate(startDate.toISOString().split('T')[0]);
       setNewStartTime(startDate.toTimeString().split(' ')[0].slice(0, 5));
       setNewEndTime(endDate.toTimeString().split(' ')[0].slice(0, 5));
     }
